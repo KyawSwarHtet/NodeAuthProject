@@ -1,0 +1,1 @@
+{"version":3,"sources":["post-route.js"],"names":["express","require","route","Router"],"mappings":";;AAAA,IAAMA,OAAO,GAAGC,OAAO,CAAC,SAAD,CAAvB;;AAEA,IAAMC,KAAK,GAAIF,OAAO,CAACG,MAAR,EAAf","sourcesContent":["const express = require(\"express\")\r\n\r\nconst route =  express.Router()"],"file":"post-route.dev.js"}
