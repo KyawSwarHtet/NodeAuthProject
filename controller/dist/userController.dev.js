@@ -221,28 +221,22 @@ var generateToken = function generateToken(id) {
   }, "".concat(process.env.JWT_SECRET), {
     expiresIn: "30d"
   });
-}; //update user fucntion
+}; //update user information fucntion
 
 
 var updateUser = asyncHandler(function _callee3(req, res) {
-  var _req$body3, username, address, gender, profilePicture, id, userDetail, filesArray, file, updatedData;
+  var _req$body3, username, address, gender, id, updatedData;
 
   return regeneratorRuntime.async(function _callee3$(_context3) {
     while (1) {
       switch (_context3.prev = _context3.next) {
         case 0:
           _req$body3 = req.body, username = _req$body3.username, address = _req$body3.address, gender = _req$body3.gender;
-          profilePicture = req.file;
-          console.log("profile picture", profilePicture);
           id = req.user.id;
-          _context3.next = 6;
-          return regeneratorRuntime.awrap(User.findById(id));
-
-        case 6:
-          userDetail = _context3.sent;
+          /* Check for user */
 
           if (req.user) {
-            _context3.next = 9;
+            _context3.next = 4;
             break;
           }
 
@@ -251,11 +245,73 @@ var updateUser = asyncHandler(function _callee3(req, res) {
             message: "user not found"
           }));
 
-        case 9:
+        case 4:
+          _context3.next = 6;
+          return regeneratorRuntime.awrap(User.updateOne({
+            _id: id
+          }, {
+            $set: {
+              username: username,
+              login: true,
+              gender: gender,
+              address: address
+            }
+          }));
+
+        case 6:
+          _context3.next = 8;
+          return regeneratorRuntime.awrap(User.findById(id));
+
+        case 8:
+          updatedData = _context3.sent;
+          res.status(200).json({
+            _id: id,
+            username: updatedData.username,
+            email: updatedData.email,
+            address: updatedData.address,
+            gender: updatedData.gender,
+            profilePicture: updatedData.profilePicture,
+            login: updatedData.login
+          });
+
+        case 10:
+        case "end":
+          return _context3.stop();
+      }
+    }
+  });
+}); //update user profile img fucntion
+
+var updateUserProfile = asyncHandler(function _callee4(req, res) {
+  var profilePicture, id, userDetail, filesArray, file, updatedData;
+  return regeneratorRuntime.async(function _callee4$(_context4) {
+    while (1) {
+      switch (_context4.prev = _context4.next) {
+        case 0:
+          profilePicture = req.file; // console.log("profile picture",profilePicture)
+
+          id = req.user.id;
+          _context4.next = 4;
+          return regeneratorRuntime.awrap(User.findById(id));
+
+        case 4:
+          userDetail = _context4.sent;
+
+          if (req.user) {
+            _context4.next = 7;
+            break;
+          }
+
+          return _context4.abrupt("return", res.status(404).json({
+            status: "FAILED",
+            message: "user not found"
+          }));
+
+        case 7:
           filesArray = [];
 
           if (!(profilePicture !== undefined && profilePicture !== [])) {
-            _context3.next = 18;
+            _context4.next = 14;
             break;
           }
 
@@ -279,42 +335,21 @@ var updateUser = asyncHandler(function _callee3(req, res) {
           } //update user
 
 
-          _context3.next = 16;
+          _context4.next = 14;
           return regeneratorRuntime.awrap(User.updateOne({
             _id: id
           }, {
             $set: {
-              username: username,
-              login: true,
-              gender: gender,
-              address: address,
               profilePicture: filesArray
             }
           }));
 
-        case 16:
-          _context3.next = 20;
-          break;
-
-        case 18:
-          _context3.next = 20;
-          return regeneratorRuntime.awrap(User.updateOne({
-            _id: id
-          }, {
-            $set: {
-              username: username,
-              login: true,
-              gender: gender,
-              address: address
-            }
-          }));
-
-        case 20:
-          _context3.next = 22;
+        case 14:
+          _context4.next = 16;
           return regeneratorRuntime.awrap(User.findById(id));
 
-        case 22:
-          updatedData = _context3.sent;
+        case 16:
+          updatedData = _context4.sent;
           res.status(200).json({
             _id: id,
             username: updatedData.username,
@@ -325,9 +360,9 @@ var updateUser = asyncHandler(function _callee3(req, res) {
             login: updatedData.login
           });
 
-        case 24:
+        case 18:
         case "end":
-          return _context3.stop();
+          return _context4.stop();
       }
     }
   });
@@ -348,25 +383,25 @@ var fileSizeFormatter = function fileSizeFormatter(bytes, decimal) {
 
 var deleteUserAccount = function deleteUserAccount(req, res) {
   var id, userDetail;
-  return regeneratorRuntime.async(function deleteUserAccount$(_context4) {
+  return regeneratorRuntime.async(function deleteUserAccount$(_context5) {
     while (1) {
-      switch (_context4.prev = _context4.next) {
+      switch (_context5.prev = _context5.next) {
         case 0:
           // const id = req.params.id;
           id = req.user.id; // console.log("id is",id)
 
-          _context4.next = 3;
+          _context5.next = 3;
           return regeneratorRuntime.awrap(User.findById(id));
 
         case 3:
-          userDetail = _context4.sent;
+          userDetail = _context5.sent;
 
           if (req.user) {
-            _context4.next = 6;
+            _context5.next = 6;
             break;
           }
 
-          return _context4.abrupt("return", res.status(404).json({
+          return _context5.abrupt("return", res.status(404).json({
             status: "FAILED",
             message: "user not found"
           }));
@@ -380,7 +415,7 @@ var deleteUserAccount = function deleteUserAccount(req, res) {
 
             console.log("file is deleted successully");
           });
-          _context4.next = 9;
+          _context5.next = 9;
           return regeneratorRuntime.awrap(User.findByIdAndRemove(id).exec());
 
         case 9:
@@ -388,7 +423,7 @@ var deleteUserAccount = function deleteUserAccount(req, res) {
 
         case 10:
         case "end":
-          return _context4.stop();
+          return _context5.stop();
       }
     }
   });
@@ -399,6 +434,7 @@ module.exports = {
   registerUser: registerUser,
   loginUser: loginUser,
   updateUser: updateUser,
+  updateUserProfile: updateUserProfile,
   deleteUserAccount: deleteUserAccount
 };
 //# sourceMappingURL=userController.dev.js.map
