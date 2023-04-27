@@ -161,11 +161,46 @@ const generateToken = (id) => {
   });
 };
 
-//update user fucntion
+//update user information fucntion
 const updateUser = asyncHandler(async (req, res) => {
   const { username,address,gender  } = req.body;
+    const id = req.user.id;
+
+  /* Check for user */
+  if (!req.user) {
+    return res.status(404).json({
+      status: "FAILED",
+        message: "user not found",    
+   })
+  }
+     //update user
+  await User.updateOne(
+    { _id: id },
+    {
+      $set: {
+        username: username,
+        login: true,
+        gender: gender,
+        address: address,
+      },
+    }
+  );
+  const updatedData = await User.findById(id);
+  res.status(200).json({
+    _id: id,
+    username: updatedData.username,
+    email: updatedData.email,
+    address: updatedData.address,
+    gender: updatedData.gender,
+    profilePicture: updatedData.profilePicture,
+    login: updatedData.login,
+  });
+});
+
+//update user profile img fucntion
+const updateUserProfile = asyncHandler(async (req, res) => {
   const profilePicture = req.file;
-  console.log("profile picture",profilePicture)
+  // console.log("profile picture",profilePicture)
     const id = req.user.id;
  
   const userDetail = await User.findById(id);
@@ -188,7 +223,6 @@ const updateUser = asyncHandler(async (req, res) => {
     };
     filesArray.push(file);
 
-
     if (userDetail.profilePicture[0] !== "") {
          //for Image File to when when we do update picture
       fs.unlink(path.join(mainPath, userDetail.profilePicture[0].filePath), (err) => {
@@ -203,30 +237,12 @@ const updateUser = asyncHandler(async (req, res) => {
     { _id: id },
     {
       $set: {
-        username: username,
-        login: true,
-        gender: gender,
-        address: address,
         profilePicture: filesArray,
-      },
-    }
-  );
-  } else {
-     //update user
-  await User.updateOne(
-    { _id: id },
-    {
-      $set: {
-        username: username,
-        login: true,
-        gender: gender,
-        address: address,
       },
     }
   );
   }
   const updatedData = await User.findById(id);
-
   res.status(200).json({
     _id: id,
     username: updatedData.username,
@@ -284,4 +300,4 @@ const deleteUserAccount = async (req, res) => {
 };
 
 
-module.exports = {getAllUser,registerUser,loginUser,updateUser,deleteUserAccount}
+module.exports = {getAllUser,registerUser,loginUser,updateUser,updateUserProfile,deleteUserAccount}
