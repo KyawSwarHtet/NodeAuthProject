@@ -10,7 +10,7 @@ var profileImg = multer.diskStorage({
     cb(null, "ProfileImages");
   },
   filename: function filename(req, file, cb) {
-    console.log("file are", file);
+    // console.log("file are",file)
     cb(null, file.originalname + "-" + Date.now() + path.extname(file.originalname));
   }
 }); // Check File Type

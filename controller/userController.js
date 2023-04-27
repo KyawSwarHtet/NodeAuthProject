@@ -7,6 +7,7 @@ const bcrypt = require("bcryptjs");
 const path = require("path");
 
 
+
 const getAllUser = (req,res) => {
     res.render("user/register", {
         pageTitle: "Register",
@@ -25,38 +26,48 @@ const registerUser = asyncHandler(async (req, res) => {
   password = password.trim();
 
   if (!username || !email || !password) {
-    res.status(400).json({
+  return  res.status(404).json({
       status: "FAILED",
       message: "Empty input Fields!",
     });
-  } else if (!/^[a-zA-Z ]*$/.test(username)) {
-    res.status(400).json({
+ 
+  }
+
+  //checking user name
+  if (!/^[a-zA-Z ]*$/.test(username)) {
+   return res.status(400).json({
       status: "FAILED",
       message: "Invalid name entered",
     });
-  } else if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
-    res.status(400).json({
+  }
+
+  //checking email
+  if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
+  return  res.status(400).json({
       status: "FAILED",
       message: "Invalid email entered",
     });
-  } else if (password.length < 8) {
-    res.status(400).json({
+  }
+  //checking password length
+  if (password.length < 8) {
+   return res.status(400).json({
       status: "FAILED",
       message: "Password is too short!",
     });
-  } else {
+  }
+  
+  //find user email from database
     await User.find({ email })
       .then((result) => {
         if (result.length) {
           //A user already exits
-
-          res.status(400).json({
+        return  res.status(400).json({
             status: "FAILED",
             message: "User with the provided email already exists",
-          });
-        } else {
-          //to create a new user
+          })
 
+        } 
+          //to create a new user
           //password handling
           const saltRounds = 10;
           bcrypt
@@ -73,8 +84,8 @@ const registerUser = asyncHandler(async (req, res) => {
                   //handle account verification
                   console.log("user  post is success");
                  
-                  // res.status(201).json(result);
-                   res.redirect("/register");
+                  res.status(201).json(result);
+                  //  res.redirect("/register");
                  
                 })
                 .catch((err) => {
@@ -90,7 +101,7 @@ const registerUser = asyncHandler(async (req, res) => {
                 message: "An error occurred while hashing password!",
               });
             });
-        }
+        
       })
       .catch((err) => {
         res.status(400).json({
@@ -98,7 +109,7 @@ const registerUser = asyncHandler(async (req, res) => {
           message: "An error occured while checking for existing user!",
         });
       });
-  }
+  
 });
 
 //@route Post/api/users/login
@@ -108,11 +119,12 @@ const loginUser = asyncHandler(async (req, res) => {
   password = password.trim();
 
   if (email == "" || password == "") {
-    res.status(400).json({
+   return res.status(400).json({
       status: "FAILED",
       message: "Empty credentials supplied",
-    });
-  } else {
+    })
+  }
+
     /* Check for user email*/
     const user = await User.findOne({ email });
     if (user && (await bcrypt.compare(password,user.password))) {
@@ -139,7 +151,7 @@ const loginUser = asyncHandler(async (req, res) => {
         message: "Email, Password is something wrong",
       });
     }
-  }
+  
 });
 
 /*Generate JWT */
@@ -151,20 +163,19 @@ const generateToken = (id) => {
 
 //update user fucntion
 const updateUser = asyncHandler(async (req, res) => {
-  const { username, email, address,gender  } = req.body;
+  const { username,address,gender  } = req.body;
   const profilePicture = req.file;
-
+  console.log("profile picture",profilePicture)
     const id = req.user.id;
-  // console.log("profile picture is", profilePicture);
-  // console.log("Id is",id);
-
-
-  // console.log("user profile picture", profilePicture);
+ 
   const userDetail = await User.findById(id);
+
   /* Check for user */
   if (!req.user) {
-    res.status(404);
-    throw new Error("user not found");
+    return res.status(404).json({
+      status: "FAILED",
+        message: "user not found",    
+   })
   }
 
   let filesArray = [];
@@ -176,54 +187,46 @@ const updateUser = asyncHandler(async (req, res) => {
       fileSize: fileSizeFormatter(profilePicture.size,2),
     };
     filesArray.push(file);
-  }
 
-  // console.log("user Detail profile", userDetail.profilePicture);
 
-  //checking img and remove old img
-  (profilePicture === [] || profilePicture === undefined) &&
-  userDetail.profilePicture[0] !== ""
-    ? userDetail.profilePicture.forEach((element) => {
-        const file = {
-          fileName: element.fileName,
-          filePath: element.filePath,
-          fileType: element.fileType,
-          fileSize: element.fileSize,
-        };
-        filesArray.push(file);
-      })
-    : userDetail.profilePicture[0] === "" ||
-      userDetail.profilePicture.length === 0
-    ? console.log("new user is updated without new profile image")
-    : userDetail.profilePicture.map(async (data, index) => {
-        
-        
-      //for Image File to when when we do update picture
-      return fs.unlink(path.join(mainPath, data.filePath), (err) => {
+    if (userDetail.profilePicture[0] !== "") {
+         //for Image File to when when we do update picture
+      fs.unlink(path.join(mainPath, userDetail.profilePicture[0].filePath), (err) => {
           if (err) {
-            console.log("error occur", err);
+          return  console.log("error occur", err);
           }
-          return console.log("file is deleted successully");
-        });
-        
-      });
-
-  //update user
+          console.log("file is deleted successully");
+        });     
+    }
+    //update user
   await User.updateOne(
     { _id: id },
     {
       $set: {
         username: username,
-        email: email,
         login: true,
         gender: gender,
         address: address,
-        profilePicture: filesArray ? filesArray : [],
+        profilePicture: filesArray,
       },
     }
   );
-
+  } else {
+     //update user
+  await User.updateOne(
+    { _id: id },
+    {
+      $set: {
+        username: username,
+        login: true,
+        gender: gender,
+        address: address,
+      },
+    }
+  );
+  }
   const updatedData = await User.findById(id);
+
   res.status(200).json({
     _id: id,
     username: updatedData.username,
@@ -233,8 +236,6 @@ const updateUser = asyncHandler(async (req, res) => {
     profilePicture: updatedData.profilePicture,
     login: updatedData.login,
   });
-  // console.log("request user token is", token);
-  // console.log("updated data user result is", updatedData);
 });
 
 //for img file format
@@ -261,32 +262,26 @@ const deleteUserAccount = async (req, res) => {
 
   /* Check for user */
   if (!req.user) {
-    res.status(401);
-    throw new Error("user not found");
+     return res.status(404).json({
+      status: "FAILED",
+        message: "user not found",    
+   }) 
   }
-    userDetail.profilePicture === []||userDetail.profilePicture[0] === '' || userDetail.profilePicture.length === 0
+  userDetail.profilePicture[0] === '' || userDetail.profilePicture.length === 0
       ? console.log("file is empty file")
-      : userDetail.profilePicture.map(async (data) => {
-          
-          return fs.unlink(path.join(mainPath, data.filePath), (err) => {
+      :       
+       fs.unlink(path.join(mainPath, userDetail.profilePicture[0].filePath), (err) => {
           // return fs.unlink(path.join(data.filePath), (err) => {
             if (err) {
-              console.log("error occur", err);
+            return  console.log("error occur", err);
             }
-
-            return console.log("file is deleted successully");
+             console.log("file is deleted successully");
           });
-        });
-
-  //if someone delete post , the favorite data also need to delete
-  // await FavModel.deleteMany({ postId: id }).exec();
 
   await User.findByIdAndRemove(id).exec();
   res.status(200).json( "User Account Deleted Successfully");
   // res.send();
 };
-
-
 
 
 module.exports = {getAllUser,registerUser,loginUser,updateUser,deleteUserAccount}
