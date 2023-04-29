@@ -299,5 +299,27 @@ const deleteUserAccount = async (req, res) => {
   // res.send();
 };
 
+/*get all user without token */
+const getAlluser = async (req, res, next) => {
+  try {
+    const users = await User.find();
+    res.status(200).send(users);
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+};
 
-module.exports = {getAllUser,registerUser,loginUser,updateUser,updateUserProfile,deleteUserAccount}
+//get user detial
+const getUserDetail = asyncHandler(async (req, res) => {
+  const id = req.params.id;
+  try {
+    const userdetail = await User.findById(id);
+    res.status(200).send(userdetail);
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+});
+
+
+
+module.exports = {getAllUser,registerUser,loginUser,updateUser,updateUserProfile,deleteUserAccount,getAlluser,getUserDetail}

@@ -15,6 +15,10 @@ router.get("/register", userInfo.getAllUser);
 router.post("/register", userInfo.registerUser);
 
 router.post("/login", userInfo.loginUser);
+//get all user information
+router.get("/alluser", userInfo.getAlluser);
+//get user detail information
+router.get("/detail/:id", userInfo.getUserDetail);
 
 router.put("/profileupdate/:id",protect,profileImgs, userInfo.updateUserProfile);
 router.put("/update/:id",protect, userInfo.updateUser);

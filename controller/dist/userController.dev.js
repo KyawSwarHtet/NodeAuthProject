@@ -428,13 +428,76 @@ var deleteUserAccount = function deleteUserAccount(req, res) {
     }
   });
 };
+/*get all user without token */
 
+
+var getAlluser = function getAlluser(req, res, next) {
+  var users;
+  return regeneratorRuntime.async(function getAlluser$(_context6) {
+    while (1) {
+      switch (_context6.prev = _context6.next) {
+        case 0:
+          _context6.prev = 0;
+          _context6.next = 3;
+          return regeneratorRuntime.awrap(User.find());
+
+        case 3:
+          users = _context6.sent;
+          res.status(200).send(users);
+          _context6.next = 10;
+          break;
+
+        case 7:
+          _context6.prev = 7;
+          _context6.t0 = _context6["catch"](0);
+          res.status(400).send(_context6.t0.message);
+
+        case 10:
+        case "end":
+          return _context6.stop();
+      }
+    }
+  }, null, null, [[0, 7]]);
+}; //get user detial
+
+
+var getUserDetail = asyncHandler(function _callee5(req, res) {
+  var id, userdetail;
+  return regeneratorRuntime.async(function _callee5$(_context7) {
+    while (1) {
+      switch (_context7.prev = _context7.next) {
+        case 0:
+          id = req.params.id;
+          _context7.prev = 1;
+          _context7.next = 4;
+          return regeneratorRuntime.awrap(User.findById(id));
+
+        case 4:
+          userdetail = _context7.sent;
+          res.status(200).send(userdetail);
+          _context7.next = 11;
+          break;
+
+        case 8:
+          _context7.prev = 8;
+          _context7.t0 = _context7["catch"](1);
+          res.status(400).send(_context7.t0.message);
+
+        case 11:
+        case "end":
+          return _context7.stop();
+      }
+    }
+  }, null, null, [[1, 8]]);
+});
 module.exports = {
   getAllUser: getAllUser,
   registerUser: registerUser,
   loginUser: loginUser,
   updateUser: updateUser,
   updateUserProfile: updateUserProfile,
-  deleteUserAccount: deleteUserAccount
+  deleteUserAccount: deleteUserAccount,
+  getAlluser: getAlluser,
+  getUserDetail: getUserDetail
 };
 //# sourceMappingURL=userController.dev.js.map
