@@ -15,7 +15,11 @@ var userInfo = require('../controller/userController'); // router.post("/login",
 
 router.get("/register", userInfo.getAllUser);
 router.post("/register", userInfo.registerUser);
-router.post("/login", userInfo.loginUser);
+router.post("/login", userInfo.loginUser); //get all user information
+
+router.get("/alluser", userInfo.getAlluser); //get user detail information
+
+router.get("/detail/:id", userInfo.getUserDetail);
 router.put("/profileupdate/:id", protect, profileImgs, userInfo.updateUserProfile);
 router.put("/update/:id", protect, userInfo.updateUser);
 router["delete"]("/delete/:id", protect, userInfo.deleteUserAccount); // router.get("/detail/:id", getDetail);
