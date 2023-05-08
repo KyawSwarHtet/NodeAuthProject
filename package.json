@@ -1,7 +1,6 @@
 {
   "name": "newnodepj1",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "start": "nodemon server.js"
@@ -24,5 +23,14 @@
     "nodemon": "^2.0.22",
     "path": "^0.12.7",
     "uuid": "^9.0.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KyawSwarHtet/NodeAuthProject.git"
+  },
+  "bugs": {
+    "url": "https://github.com/KyawSwarHtet/NodeAuthProject/issues"
+  },
+  "homepage": "https://github.com/KyawSwarHtet/NodeAuthProject#readme",
+  "description": ""
 }
